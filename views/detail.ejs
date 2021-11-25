@@ -40,52 +40,47 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.4.0/socket.io.js"></script>
 
     <link href="/static/mystyle.css" rel="stylesheet" />
-    <title>스파르타 블로그 | 글 목록</title>
     <script>
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const postId = urlParams.get("postId");
+
       $(document).ready(function () {
-        get_list();
+        get_detail();
       });
 
-      function get_list() {
-        $("#listbody").empty();
-
+      function get_detail() {
         $.ajax({
           type: "GET",
-          url: `/api/list`,
+          url: `/api/list/${postId}`,
           data: {},
-          success: function (response) {
-            let writing = response["post"];
-            for (let i = 0; i < writing.length; i++) {
-              make_card(writing[i], i + 1);
+          error: function (xhr, status, error) {
+            if (status == 404) {
+              alert("존재하지 않는 글입니다.");
             }
+            window.location.href = "/";
+          },
+          success: function (response) {
+            let Detail = response["detail"];
+            $("#contentTd").text(Detail["content"]);
+            $("#titleTd").text(Detail["title"]);
+            $("#dateTd").text(Detail["date"]);
+            $("#writerTd").text(Detail["writer"]);
           },
         });
       }
-
-      function make_card(item, i) {
-        let htmlTemp = `<tr class="pointTr" onclick="location.href='/details?postId=${item["postId"]}'">
-            <td style="width: 10%;">${i}</td>
-            <td style="width: 30%;">${item["writer"]}</td>
-            <td style="width: 30%;">${item["title"]}</td>
-            <td style="width: 30%;">${item["date"]}</td>
-          </tr>`;
-        $("#listbody").append(htmlTemp);
+      function update() {
+        location.href = `/update?postId=${postId}`;
       }
     </script>
+    <title>스파르타 블로그 | 글 상세</title>
+
     <style>
-      .pointTr {
-        cursor: pointer;
-      }
-
-      html {
-        overflow: auto;
-      }
-
       table.mb-5 {
-        width: 70%;
+        width: 45%;
+        height: 60%;
         border-collapse: separate;
         border-spacing: 1px;
         text-align: left;
@@ -104,6 +99,12 @@
         padding: 10px;
         vertical-align: top;
         border-bottom: 1px solid #ccc;
+      }
+
+      li {
+        cursor: pointer;
+        color: white;
+        margin-left: 10px;
       }
     </style>
   </head>
@@ -138,28 +139,37 @@
         id="navbarSupportedContent"
       >
         <ul class="navbar-nav mr-auto text-right">
-          <li class="nav-item" id="link-cart">
-            <a class="nav-link" href="/write"> 글쓰기 </a>
-          </li>
+          <li class="nav-item" id="link-cart" onclick="update()">글수정</li>
         </ul>
       </div>
     </nav>
     <div>
-      <table id="List" class="mb-5">
+      <!-- 여기 넣기 -->
+      <table class="mb-5">
         <tr>
-          <th>번호</th>
-          <th>작성자</th>
           <th>제목</th>
-          <th>작성날짜</th>
         </tr>
-        <tbody id="listbody">
-          <tr>
-            <td>${item["writingId]}</td>
-            <td>${item["title"]}</td>
-            <td>${item["writer"]}</td>
-            <td>${item[date]}</td>
-          </tr>
-        </tbody>
+        <tr>
+          <td id="titleTd" colspan="3"></td>
+        </tr>
+        <tr>
+          <th>작성자</th>
+        </tr>
+        <tr>
+          <td id="writerTd"></td>
+        </tr>
+        <tr>
+          <th>작성 날짜</th>
+        </tr>
+        <tr>
+          <td id="dateTd"></td>
+        </tr>
+        <tr>
+          <th>내용</th>
+        </tr>
+        <tr>
+          <td id="contentTd" colspan="4" style="height: 100%"></td>
+        </tr>
       </table>
     </div>
   </body>

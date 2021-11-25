@@ -14,4 +14,10 @@ router.get("/list", async (req, res, next) => {
   }
 });
 
+//글 상세보기
+router.get("/list/:postId", async (req, res) => {
+  const { postId } = req.params;
+  post = await Post.findOne({ _id: postId });
+  res.json({ detail: post });
+});
 module.exports = router;

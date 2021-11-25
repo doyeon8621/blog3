@@ -40,6 +40,11 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+//글상세
+app.get("/details", (req, res) => {
+  res.render("detail");
+});
+
 app.listen(3000, () => {
   console.log(`listening at http://localhost:3000`);
 });
