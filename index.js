@@ -45,6 +45,15 @@ app.get("/details", (req, res) => {
   res.render("detail");
 });
 
+//글 수정하기
+app.get("/update", (req, res) => {
+  res.render("update");
+});
+//글 쓰기
+app.get("/write", (req, res) => {
+  res.render("write");
+});
+
 app.listen(3000, () => {
   console.log(`listening at http://localhost:3000`);
 });
