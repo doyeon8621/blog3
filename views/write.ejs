@@ -42,12 +42,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <link href="/static/mystyle.css" rel="stylesheet" />
+    <script src="/static/api.js"></script>
     <script>
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const writingId = urlParams.get("writingId");
-
-      
+    let user;
+     getSelf(function (u) {
+       user = u;
+      });
       function post_write() {
         let today = new Date();
         let todate =`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}`;
@@ -59,8 +59,11 @@
             $.ajax({
             type: "POST",
             url: `/api/write`,
+            headers: {
+                  authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
             data: {
-                title:title, writer:writer, date:todate, content:content
+                title:title, date:todate, content:content
             },
             error: function (xhr, status, error) {
                 if (status == 400) {

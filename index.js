@@ -14,6 +14,7 @@ const router = express.Router();
 //유저 api용 router객체 설정
 const UserRouter = require("./routers/user");
 const PostRouter = require("./routers/post");
+const authMiddleware = require("./middlewares/auth-middleware");
 
 //json으로 데이터를 가공해 주는 미들웨어
 app.use(express.urlencoded({ extended: false }));

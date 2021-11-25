@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
+const authMiddleware = require("../middlewares/auth-middleware");
 
 /*
 회원가입
@@ -46,6 +47,13 @@ router.post("/auth", async (req, res) => {
   }
   res.send({
     token: jwt.sign({ userId: user.userId }, "secret-secret-key"),
+  });
+});
+//로그인 중인지 확인
+router.get("/users/me", authMiddleware, async (req, res) => {
+  const { user } = res.locals;
+  res.send({
+    user,
   });
 });
 
