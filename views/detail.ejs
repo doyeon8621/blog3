@@ -41,7 +41,8 @@
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-    <link href="/static/mystyle.css" rel="stylesheet" />
+    <link href="../static/mystyle.css" rel="stylesheet" />
+    <script src="../static/api.js"></script>
     <script>
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
@@ -69,8 +70,20 @@
             $("#titleTd").text(Detail["title"]);
             $("#dateTd").text(Detail["date"]);
             $("#writerTd").text(Detail["writer"]);
+            confirmMe(Detail["writer"]);
           },
         });
+      }
+      function confirmMe(writer) {
+        console.log("postwriter" + writer);
+        let tokenUser = "";
+        if (localStorage.getItem("token")) {
+          getSelf(function (user) {
+            tokenUser = user.nickname;
+            console.log("usernickname" + tokenUser);
+            if (writer === tokenUser) $("#link-update").show();
+          });
+        }
       }
       function update() {
         location.href = `/update?postId=${postId}`;
@@ -210,8 +223,15 @@
         class="navbar-collapse collapse flex-grow-0 ml-auto"
         id="navbarSupportedContent"
       >
-        <ul class="navbar-nav mr-auto text-right">
-          <li class="nav-item" id="link-cart" onclick="update()">글수정</li>
+        <ul class="navbar-nav mr-auto text-right" id="buttonBar">
+          <li
+            class="nav-item"
+            id="link-update"
+            style="display: none"
+            onclick="update()"
+          >
+            글수정
+          </li>
         </ul>
       </div>
     </nav>

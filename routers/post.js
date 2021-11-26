@@ -40,8 +40,8 @@ router.post("/write", authMiddleware, async (req, res) => {
 router.patch("/update/:postId/set", authMiddleware, async (req, res) => {
   const { postId } = req.params;
   const { title, content, date } = req.body;
-
-  let post = await Post.findOne({ postId });
+  const nickname = res.locals.user.nickname;
+  let post = await Post.findOne({ _id: postId });
   if (post) {
     post.title = title;
     post.content = content;
