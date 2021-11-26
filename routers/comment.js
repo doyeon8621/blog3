@@ -44,7 +44,7 @@ router.patch("/update/:commentId/set", authMiddleware, async (req, res) => {
   const todate = `${today.getFullYear()}-${
     today.getMonth() + 1
   }-${today.getDate()} ${today.getHours()}:${today.getMinutes()}`;
-  let comment = await Comment.findOne({ commentId });
+  let comment = await Comment.findOne({ _id: commentId });
   if (comment) {
     comment.content = content;
     comment.date = todate;
