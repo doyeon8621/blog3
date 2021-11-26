@@ -74,6 +74,7 @@
           },
         });
       }
+      //내가쓴 글에만 수정하기 버튼이 보인다
       function confirmMe(writer) {
         console.log("postwriter" + writer);
         let tokenUser = "";
@@ -85,6 +86,7 @@
           });
         }
       }
+      //수정하기 페이지로 이동
       function update() {
         location.href = `/update?postId=${postId}`;
       }
@@ -116,7 +118,7 @@
           },
         });
       }
-
+      //댓글들을 불러오기
       function get_commentList() {
         $.ajax({
           type: "GET",
@@ -124,26 +126,52 @@
           data: {},
           success: function (response) {
             let comments = response["commentlist"];
+
             for (let item of comments) {
               make_commentOne(item);
+              confirmMe_cmt(item["writer"], item["commentId"]);
             }
           },
         });
       }
+      //내가 쓴 댓은 수정 삭제 버튼이 보인다
+      function confirmMe_cmt(writer, commentId) {
+        console.log("postwriter2" + writer);
+        let tokenUser = "";
+        if (localStorage.getItem("token")) {
+          getSelf(function (user) {
+            tokenUser = user.nickname;
+            console.log("usernickname2" + tokenUser);
+            if (writer === tokenUser) {
+              $(`#cmtup${commentId}`).show();
+              $(`#cmtdel${commentId}`).show();
+            }
+          });
+        }
+      }
+      //댓 목록을 그린다
       function make_commentOne(item) {
         const { writer, content, commentId } = item;
 
         let htmlTemp =
           `<tr><td>${writer}</td>
-          <td>${content}</td>` +
-          "<td  onclick=\"deleteComment('" +
+          <td id="cmtcon${commentId}">${content}</td>
+          <td id="cmtdel${commentId}" style="display:none"` +
+          " onclick=\"deleteComment('" +
           commentId +
           "' )\">X</td>" +
-          `<td onclick="updateComment()">E</td>
-          </tr>`;
+          `<td id="cmtup${commentId}"style="display:none"` +
+          " onclick=\"updatePop('" +
+          commentId +
+          "')\">Edit</td>" +
+          `<td id="cmtok${commentId}" style="display:none;" colspan="3"><input type="text" id="cmtinput${commentId}" style="width:85%;">` +
+          "<button class='comment_btn' onclick=\"commentUpdate('" +
+          commentId +
+          "')\">수정</button>" +
+          `</tr>`;
         $("#commentList").append(htmlTemp);
       }
-
+      //댓을 삭제한다
       function deleteComment(commentId) {
         $.ajax({
           type: "DELETE",
@@ -159,39 +187,45 @@
           },
         });
       }
+      //댓 수정할 폼으로 변한다
+      function updatePop(i) {
+        $(`#cmtcon${i}`).hide();
+        $(`#cmtdel${i}`).hide();
+        $(`#cmtup${i}`).hide();
+        $(`#cmtok${i}`).show();
+        const commentText = $(`#cmtcon${i}`).text().trim();
+        $(`#cmtinput${i}`).val(commentText);
+      }
+      //수정이 끝나면 보기전용으로 돌아간다
+      function updateHide(i) {
+        $(`#cmtcon${i}`).show();
+        $(`#cmtdel${i}`).show();
+        $(`#cmtup${i}`).show();
+        $(`#cmtok${i}`).hide();
+      }
+      //수정을 한다
+      function commentUpdate(commentId) {
+        const content = $(`#cmtinput${commentId}`).val();
+        $.ajax({
+          type: "PATCH",
+          url: `/comment/update/${commentId}/set`,
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          data: { content: content },
+          error: function (error) {
+            alert(error.responseJSON.errorMessage);
+          },
+          success: function (response) {
+            if (response["result"] == "success") {
+            }
+          },
+        });
+        updateHide(commentId);
+        $(`#cmtcon${commentId}`).text(content);
+      }
     </script>
     <title>스파르타 블로그 | 글 상세</title>
-
-    <style>
-      table.mb-5 {
-        width: 45%;
-        height: 60%;
-        border-collapse: separate;
-        border-spacing: 1px;
-        text-align: left;
-        line-height: 1.5;
-        border-top: 1px solid #ccc;
-        margin: 40px auto 20px auto;
-      }
-      table.mb-5 th {
-        padding: 10px;
-        font-weight: bold;
-        vertical-align: top;
-        border-bottom: 4px solid #e8344e;
-        background: white;
-      }
-      table.mb-5 td {
-        padding: 10px;
-        vertical-align: top;
-        border-bottom: 1px solid #ccc;
-      }
-
-      li {
-        cursor: pointer;
-        color: white;
-        margin-left: 10px;
-      }
-    </style>
   </head>
 
   <body>
@@ -237,7 +271,7 @@
     </nav>
     <div>
       <!-- 여기 넣기 -->
-      <table class="mb-5">
+      <table class="detailTB">
         <tr>
           <th>제목</th>
         </tr>
@@ -264,12 +298,11 @@
         </tr>
       </table>
       <div>
-        <input type="text" id="commentContentInput" /><button
-          onclick="commentWrite()"
-        >
-          댓글달기
-        </button>
-        <table id="commentList"></table>
+        <div class="cmtWriteDiv">
+          <input type="text" id="commentContentInput" style="width: 85%" />
+          <button onclick="commentWrite()" class="comment_btn">댓글달기</button>
+        </div>
+        <table id="commentList" class="detailTB"></table>
       </div>
     </div>
   </body>

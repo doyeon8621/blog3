@@ -4,7 +4,7 @@ const Comment = require("../models/comment");
 const router = express.Router();
 const authMiddleware = require("../middlewares/auth-middleware");
 
-//글 전체 목록보기
+//댓 전체 목록보기
 router.get("/list", async (req, res, next) => {
   const { postId } = req.query;
   try {
@@ -16,7 +16,7 @@ router.get("/list", async (req, res, next) => {
   }
 });
 
-//글쓰기
+//댓쓰기
 router.post("/write/:postId", authMiddleware, async (req, res) => {
   const { date, content, postId } = req.body;
   const writer = res.locals.user.nickname;
@@ -36,15 +36,18 @@ router.post("/write/:postId", authMiddleware, async (req, res) => {
   res.send({ result: "success" });
 });
 
-//글수정
+//댓수정
 router.patch("/update/:commentId/set", authMiddleware, async (req, res) => {
   const { commentId } = req.params;
-  const { content, date } = req.body;
-
+  const { content } = req.body;
+  let today = new Date();
+  const todate = `${today.getFullYear()}-${
+    today.getMonth() + 1
+  }-${today.getDate()} ${today.getHours()}:${today.getMinutes()}`;
   let comment = await Comment.findOne({ commentId });
   if (comment) {
     comment.content = content;
-    comment.date = date;
+    comment.date = todate;
     await comment.save();
   }
   res.send({ result: "success" });
