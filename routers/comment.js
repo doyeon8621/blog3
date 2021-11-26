@@ -5,8 +5,8 @@ const router = express.Router();
 const authMiddleware = require("../middlewares/auth-middleware");
 
 //글 전체 목록보기
-router.get("/list/:postId", async (req, res, next) => {
-  const { postId } = req.params;
+router.get("/list", async (req, res, next) => {
+  const { postId } = req.query;
   try {
     const comments = await Comment.find({ postId: postId }).sort("-date");
     res.json({ commentlist: comments });
@@ -20,9 +20,6 @@ router.get("/list/:postId", async (req, res, next) => {
 router.post("/write/:postId", authMiddleware, async (req, res) => {
   const { date, content, postId } = req.body;
   const writer = res.locals.user.nickname;
-  console.log(
-    `@@@@@@@@@@글번호${postId},작서자${writer},작성글${content}@@@@@@@@@@@`
-  );
   await Comment.create({
     postId,
     writer,

@@ -49,6 +49,7 @@
 
       $(document).ready(function () {
         get_detail();
+        get_commentList();
       });
 
       function get_detail() {
@@ -103,6 +104,26 @@
             }
           },
         });
+      }
+
+      function get_commentList() {
+        $("#commentList").empty();
+
+        $.ajax({
+          type: "GET",
+          url: `/comment/list?postId=${postId}`,
+          data: {},
+          success: function (response) {
+            let comments = response["commentlist"];
+            for (let i = 0; i < comments.length; i++) {
+              make_commentOne(comments[i], i + 1);
+            }
+          },
+        });
+      }
+      function make_commentOne(item, i) {
+        let htmlTemp = `<tr><td>${item["writer"]}</td><td>${item["content"]}</td></tr>`;
+        $("#commentList").append(htmlTemp);
       }
     </script>
     <title>스파르타 블로그 | 글 상세</title>
@@ -207,6 +228,7 @@
         >
           댓글달기
         </button>
+        <table id="commentList"></table>
       </div>
     </div>
   </body>
