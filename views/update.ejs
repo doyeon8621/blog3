@@ -45,7 +45,7 @@
     <script>
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
-      const writingId = urlParams.get("writingId");
+      const postId = urlParams.get("postId");
 
       $(document).ready(function () {
         get_detail();
@@ -54,7 +54,7 @@
       function get_detail() {
         $.ajax({
           type: "GET",
-          url: `/api/list/${writingId}`,
+          url: `/api/list/${postId}`,
           data: {},
           error: function (xhr, status, error) {
             if (status == 404) {
@@ -66,32 +66,24 @@
             let Detail = response["detail"];
             $("#contentInput").text(Detail["content"]);
             $("#titleInput").attr("value", Detail["title"]);
-            $("#nameInput").attr("value", Detail["writer"]);
-            sessionStorage.setItem("password", Detail["password"]);
           },
         });
       }
 
       function delete_one() {
-        let password = $("#psInput").val();
-        if (sessionStorage.getItem("password") === password) {
-          $.ajax({
-            type: "DELETE",
-            url: `/api/update/${writingId}/delete`,
-            data: {},
-            success: function (response) {
-              if (response["result"] == "success") {
-                alert("글이 삭제되었습니다.");
-                location.href = "/";
-              }
-            },
-          });
-        } else {
-          alert("비밀번호가 다릅니다.");
-        }
+        $.ajax({
+          type: "DELETE",
+          url: `/api/update/${postId}/delete`,
+          data: {},
+          success: function (response) {
+            if (response["result"] == "success") {
+              alert("글이 삭제되었습니다.");
+              location.href = "/";
+            }
+          },
+        });
       }
       function update_one() {
-        let password = $("#psInput").val();
         let title = $("#titleInput").val();
         let today = new Date();
         let todate = `${today.getFullYear()}-${
@@ -105,7 +97,7 @@
         else {
           $.ajax({
             type: "PATCH",
-            url: `/api/update/${writingId}/set`,
+            url: `/api/update/${postId}/set`,
             data: { title: title, date: todate, content: content },
             success: function (response) {
               if (response["result"] == "success") {
@@ -173,14 +165,6 @@
         <tr>
           <th>제목</th>
           <td><input type="text" id="titleInput" /></td>
-        </tr>
-        <tr>
-          <th>작성자</th>
-          <td><input type="text" id="nameInput" readonly /></td>
-        </tr>
-        <tr>
-          <th>비밀번호</th>
-          <td><input type="password" id="psInput" /></td>
         </tr>
 
         <tr>

@@ -36,4 +36,30 @@ router.post("/write", authMiddleware, async (req, res) => {
   res.send({ result: "success" });
 });
 
+//글수정
+router.patch("/update/:postId/set", async (req, res) => {
+  const { postId } = req.params;
+  const { title, content, date } = req.body;
+
+  let post = await Post.findOne({ postId });
+  if (post) {
+    post.title = title;
+    post.content = content;
+    post.date = date;
+    await post.save();
+  }
+  res.send({ result: "success" });
+});
+//글삭제
+router.delete("/update/:postId/delete", async (req, res) => {
+  const { postId } = req.params;
+
+  const post = await Post.find({ postId });
+  if (post.length > 0) {
+    await Post.deleteOne({ _id: postId });
+  }
+
+  res.send({ result: "success" });
+});
+
 module.exports = router;
