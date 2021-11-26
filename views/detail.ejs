@@ -74,6 +74,36 @@
       function update() {
         location.href = `/update?postId=${postId}`;
       }
+      function commentWrite() {
+        let today = new Date();
+        let todate = `${today.getFullYear()}-${
+          today.getMonth() + 1
+        }-${today.getDate()} ${today.getHours()}:${today.getMinutes()}`;
+        let content = $("#commentContentInput").val();
+        $.ajax({
+          type: "POST",
+          url: `/comment/write/${postId}`,
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          data: {
+            postId: postId,
+            date: todate,
+            content: content,
+          },
+          error: function (xhr, status, error) {
+            if (status == 400) {
+              alert("error");
+            }
+            window.location.href = "/";
+          },
+          success: function (response) {
+            if (response["result"] == "success") {
+              $("#commentContentInput").val("");
+            }
+          },
+        });
+      }
     </script>
     <title>스파르타 블로그 | 글 상세</title>
 
@@ -171,6 +201,13 @@
           <td id="contentTd" colspan="4" style="height: 100%"></td>
         </tr>
       </table>
+      <div>
+        <input type="text" id="commentContentInput" /><button
+          onclick="commentWrite()"
+        >
+          댓글달기
+        </button>
+      </div>
     </div>
   </body>
 </html>

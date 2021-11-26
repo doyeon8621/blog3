@@ -14,7 +14,7 @@ const router = express.Router();
 //유저 api용 router객체 설정
 const UserRouter = require("./routers/user");
 const PostRouter = require("./routers/post");
-const authMiddleware = require("./middlewares/auth-middleware");
+const CommentRouter = require("./routers/comment");
 
 //json으로 데이터를 가공해 주는 미들웨어
 app.use(express.urlencoded({ extended: false }));
@@ -27,6 +27,7 @@ app.set("view engine", "ejs");
 //router 객체 사용
 app.use("/api", [UserRouter]);
 app.use("/api", [PostRouter]);
+app.use("/comment", [CommentRouter]);
 //로그인
 app.get("/logins", (req, res) => {
   res.render("login");
