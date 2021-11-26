@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
   const [tokenType, tokenValue] = authorization.split(" ");
   if (tokenType !== "Bearer") {
     res.status(401).send({
-      errorMessage: "로그인 후 사용하세요",
+      errorMessage: "로그인 후 사용하세요1",
     });
     return;
   }
@@ -22,7 +22,7 @@ module.exports = (req, res, next) => {
     //유저가 없을지도 구현안 함//
   } catch (error) {
     res.status(401).send({
-      errorMessage: "로그인 후 사용하세요",
+      errorMessage: "로그인 후 사용하세요2",
     });
     return;
   }

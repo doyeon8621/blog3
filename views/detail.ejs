@@ -92,38 +92,59 @@
             date: todate,
             content: content,
           },
-          error: function (xhr, status, error) {
-            if (status == 400) {
-              alert("error");
-            }
-            window.location.href = "/";
+          error: function (error) {
+            alert(error.responseJSON.errorMessage);
+            window.location.href = "/logins";
           },
           success: function (response) {
             if (response["result"] == "success") {
-              $("#commentContentInput").val("");
+              window.location.reload();
             }
           },
         });
       }
 
       function get_commentList() {
-        $("#commentList").empty();
-
         $.ajax({
           type: "GET",
           url: `/comment/list?postId=${postId}`,
           data: {},
           success: function (response) {
             let comments = response["commentlist"];
-            for (let i = 0; i < comments.length; i++) {
-              make_commentOne(comments[i], i + 1);
+            for (let item of comments) {
+              make_commentOne(item);
             }
           },
         });
       }
-      function make_commentOne(item, i) {
-        let htmlTemp = `<tr><td>${item["writer"]}</td><td>${item["content"]}</td></tr>`;
+      function make_commentOne(item) {
+        const { writer, content, commentId } = item;
+
+        let htmlTemp =
+          `<tr><td>${writer}</td>
+          <td>${content}</td>` +
+          "<td  onclick=\"deleteComment('" +
+          commentId +
+          "' )\">X</td>" +
+          `<td onclick="updateComment()">E</td>
+          </tr>`;
         $("#commentList").append(htmlTemp);
+      }
+
+      function deleteComment(commentId) {
+        $.ajax({
+          type: "DELETE",
+          url: `/comment/update/${commentId}/delete`,
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          data: {},
+          success: function (response) {
+            if (response["result"] == "success") {
+              window.location.reload();
+            }
+          },
+        });
       }
     </script>
     <title>스파르타 블로그 | 글 상세</title>

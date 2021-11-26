@@ -20,6 +20,12 @@ router.get("/list", async (req, res, next) => {
 router.post("/write/:postId", authMiddleware, async (req, res) => {
   const { date, content, postId } = req.body;
   const writer = res.locals.user.nickname;
+  if (!writer) {
+    res.status(401).send({
+      errorMessage: "로그인 후 사용하세요3",
+    });
+    return;
+  }
   await Comment.create({
     postId,
     writer,
@@ -50,9 +56,8 @@ router.delete("/update/:commentId/delete", authMiddleware, async (req, res) => {
   const comment = await Comment.find({ commentId });
   if (comment.length > 0) {
     await Comment.deleteOne({ _id: commentId });
+    res.send({ result: "success" });
   }
-
-  res.send({ result: "success" });
 });
 
 module.exports = router;
