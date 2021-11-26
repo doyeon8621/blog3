@@ -43,6 +43,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.4.0/socket.io.js"></script>
 
     <link href="/static/mystyle.css" rel="stylesheet" />
+    <script src="/static/api.js"></script>
     <title>스파르타 블로그 | 글 목록</title>
     <script>
       $(document).ready(function () {
@@ -141,6 +142,55 @@
           <li class="nav-item" id="link-cart">
             <a class="nav-link" href="/write"> 글쓰기 </a>
           </li>
+        </li>
+        <li class="nav-item" id="link-logout">
+          <a class="nav-link" data-toggle="modal" data-target="#signOutModal">
+            로그아웃<i class="fa fa-sign-out ml-2" aria-hidden="true"></i>
+          </a>
+          <div
+            class="modal text-left"
+            id="signOutModal"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="signOutModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="signOutModalLabel">로그아웃</h5>
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  정말로 로그아웃 하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-outline-sparta"
+                    data-dismiss="modal"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sparta"
+                    onclick="signOut()"
+                  >
+                    로그아웃하기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
         </ul>
       </div>
     </nav>

@@ -52,6 +52,13 @@ router.post("/auth", async (req, res) => {
 //로그인 중인지 확인
 router.get("/users/me", authMiddleware, async (req, res) => {
   const { user } = res.locals;
+  if (!user) {
+    res.status(401).send({
+      errorMessage: "로그인이 필요합니다.",
+    });
+    return;
+  }
+
   res.send({
     user,
   });

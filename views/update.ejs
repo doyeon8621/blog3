@@ -42,11 +42,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <link href="/static/mystyle.css" rel="stylesheet" />
+    <script src="/static/api.js"></script>
     <script>
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const postId = urlParams.get("postId");
-
+      let user;
+      getSelf(function (u) {
+        user = u;
+      });
       $(document).ready(function () {
         get_detail();
       });
@@ -74,6 +78,9 @@
         $.ajax({
           type: "DELETE",
           url: `/api/update/${postId}/delete`,
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
           data: {},
           success: function (response) {
             if (response["result"] == "success") {
@@ -98,6 +105,9 @@
           $.ajax({
             type: "PATCH",
             url: `/api/update/${postId}/set`,
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
             data: { title: title, date: todate, content: content },
             success: function (response) {
               if (response["result"] == "success") {
