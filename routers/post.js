@@ -1,6 +1,7 @@
 const express = require("express");
 const Post = require("../models/post");
 //const jwt = require("jsonwebtoken");
+const Joi = require("joi");
 const router = express.Router();
 const authMiddleware = require("../middlewares/auth-middleware");
 
@@ -21,34 +22,60 @@ router.get("/list/:postId", async (req, res) => {
   const posts = await Post.findOne({ _id: postId });
   res.json({ detail: posts });
 });
+/*
+유효성검사
+*/
+const postPostsSchema = Joi.object({
+  title: Joi.string().required(),
+  content: Joi.string().required(),
+  writer: Joi.string().required(),
+});
 
 //글쓰기
 router.post("/write", authMiddleware, async (req, res) => {
-  const { title, date, content } = req.body;
-  const writer = res.locals.user.nickname;
-  await Post.create({
-    title,
-    writer,
-    date,
-    content,
-  });
+  try {
+    const { title, date, content } = await postPostsSchema.validateAsync(
+      req.body
+    );
+    const writer = res.locals.user.nickname;
+    await Post.create({
+      title,
+      writer,
+      date,
+      content,
+    });
 
-  res.send({ result: "success" });
+    res.send({ result: "success" });
+  } catch (err) {
+    console.log(err);
+    res.status(400).send({
+      errorMessage: "요청한 데이터 형식이 올바르지 않습니다.",
+    });
+  }
 });
 
 //글수정
 router.patch("/update/:postId/set", authMiddleware, async (req, res) => {
-  const { postId } = req.params;
-  const { title, content, date } = req.body;
-  const nickname = res.locals.user.nickname;
-  let post = await Post.findOne({ _id: postId });
-  if (post) {
-    post.title = title;
-    post.content = content;
-    post.date = date;
-    await post.save();
+  try {
+    const { postId } = req.params;
+    const { title, content, date } = await postPostsSchema.validateAsync(
+      req.body
+    );
+    const nickname = res.locals.user.nickname;
+    let post = await Post.findOne({ _id: postId });
+    if (post) {
+      post.title = title;
+      post.content = content;
+      post.date = date;
+      await post.save();
+    }
+    res.send({ result: "success" });
+  } catch (err) {
+    console.log(err);
+    res.status(400).send({
+      errorMessage: "요청한 데이터 형식이 올바르지 않습니다.",
+    });
   }
-  res.send({ result: "success" });
 });
 //글삭제
 router.delete("/update/:postId/delete", authMiddleware, async (req, res) => {

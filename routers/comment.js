@@ -1,6 +1,7 @@
 const express = require("express");
 const Comment = require("../models/comment");
 //const jwt = require("jsonwebtoken");
+const Joi = require("joi");
 const router = express.Router();
 const authMiddleware = require("../middlewares/auth-middleware");
 
@@ -15,42 +16,65 @@ router.get("/list", async (req, res, next) => {
     next(err);
   }
 });
+/*
+유효성검사
+*/
+const postCommentsSchema = Joi.object({
+  content: Joi.string().required(),
+  writer: Joi.string().required(),
+});
 
 //댓쓰기
 router.post("/write/:postId", authMiddleware, async (req, res) => {
-  const { date, content, postId } = req.body;
-  const writer = res.locals.user.nickname;
-  if (!writer) {
-    res.status(401).send({
-      errorMessage: "로그인 후 사용하세요3",
+  try {
+    const { date, content, postId } = await postCommentsSchema.validateAsync(
+      req.body
+    );
+    const writer = res.locals.user.nickname;
+    if (!writer) {
+      res.status(401).send({
+        errorMessage: "로그인 후 사용하세요3",
+      });
+      return;
+    }
+    await Comment.create({
+      postId,
+      writer,
+      date,
+      content,
     });
-    return;
-  }
-  await Comment.create({
-    postId,
-    writer,
-    date,
-    content,
-  });
 
-  res.send({ result: "success" });
+    res.send({ result: "success" });
+  } catch (err) {
+    console.log(err);
+    res.status(400).send({
+      errorMessage: "요청한 데이터 형식이 올바르지 않습니다.",
+    });
+  }
 });
 
 //댓수정
 router.patch("/update/:commentId/set", authMiddleware, async (req, res) => {
-  const { commentId } = req.params;
-  const { content } = req.body;
-  let today = new Date();
-  const todate = `${today.getFullYear()}-${
-    today.getMonth() + 1
-  }-${today.getDate()} ${today.getHours()}:${today.getMinutes()}`;
-  let comment = await Comment.findOne({ _id: commentId });
-  if (comment) {
-    comment.content = content;
-    comment.date = todate;
-    await comment.save();
+  try {
+    const { commentId } = req.params;
+    const { content } = await postCommentsSchema.validateAsync(req.body);
+    let today = new Date();
+    const todate = `${today.getFullYear()}-${
+      today.getMonth() + 1
+    }-${today.getDate()} ${today.getHours()}:${today.getMinutes()}`;
+    let comment = await Comment.findOne({ _id: commentId });
+    if (comment) {
+      comment.content = content;
+      comment.date = todate;
+      await comment.save();
+    }
+    res.send({ result: "success" });
+  } catch (err) {
+    console.log(err);
+    res.status(400).send({
+      errorMessage: "요청한 데이터 형식이 올바르지 않습니다.",
+    });
   }
-  res.send({ result: "success" });
 });
 //글삭제
 router.delete("/update/:commentId/delete", authMiddleware, async (req, res) => {
