@@ -33,7 +33,7 @@ router.post("/write/:postId", authMiddleware, async (req, res) => {
     const writer = res.locals.user.nickname;
     if (!writer) {
       res.status(401).send({
-        errorMessage: "로그인 후 사용하세요3",
+        errorMessage: "로그인이 필요합니다.",
       });
       return;
     }
