@@ -23,12 +23,12 @@ router.get("/list/:postId", async (req, res) => {
   res.json({ detail: posts });
 });
 /*
-유효성검사
+글쓰기 유효성검사
 */
 const postPostsSchema = Joi.object({
   title: Joi.string().required(),
   content: Joi.string().required(),
-  writer: Joi.string().required(),
+  date: Joi.string().required(),
 });
 
 //글쓰기

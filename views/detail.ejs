@@ -90,6 +90,7 @@
       function update() {
         location.href = `/update?postId=${postId}`;
       }
+      //댓글을 단다
       function commentWrite() {
         let today = new Date();
         let todate = `${today.getFullYear()}-${
@@ -107,9 +108,11 @@
             date: todate,
             content: content,
           },
-          error: function (error) {
+          error: function (error, textStatus, errorThrown) {
             alert(error.responseJSON.errorMessage);
-            window.location.href = "/logins";
+            if (error.status == 401) {
+              window.location.replace("/logins");
+            }
           },
           success: function (response) {
             if (response["result"] == "success") {
@@ -173,19 +176,21 @@
       }
       //댓을 삭제한다
       function deleteComment(commentId) {
-        $.ajax({
-          type: "DELETE",
-          url: `/comment/update/${commentId}/delete`,
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          data: {},
-          success: function (response) {
-            if (response["result"] == "success") {
-              window.location.reload();
-            }
-          },
-        });
+        if (confirm("댓글을 삭제하시겠습니까?")) {
+          $.ajax({
+            type: "DELETE",
+            url: `/comment/update/${commentId}/delete`,
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            data: {},
+            success: function (response) {
+              if (response["result"] == "success") {
+                window.location.reload();
+              }
+            },
+          });
+        }
       }
       //댓 수정할 폼으로 변한다
       function updatePop(i) {
@@ -213,16 +218,19 @@
             authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           data: { content: content },
-          error: function (error) {
+          error: function (error, textStatus, errorThrown) {
             alert(error.responseJSON.errorMessage);
+            if (error.status == 401) {
+              window.location.replace("/logins");
+            }
           },
           success: function (response) {
             if (response["result"] == "success") {
+              updateHide(commentId);
+              $(`#cmtcon${commentId}`).text(content);
             }
           },
         });
-        updateHide(commentId);
-        $(`#cmtcon${commentId}`).text(content);
       }
     </script>
     <title>스파르타 블로그 | 글 상세</title>

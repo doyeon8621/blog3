@@ -21,22 +21,24 @@ router.get("/list", async (req, res, next) => {
 */
 const postCommentsSchema = Joi.object({
   content: Joi.string().required(),
-  writer: Joi.string().required(),
+  date: Joi.string(),
+  postId: Joi.string(),
 });
 
 //댓쓰기
 router.post("/write/:postId", authMiddleware, async (req, res) => {
+  const writer = res.locals.user.nickname;
+  if (!writer) {
+    res.status(401).send({
+      errorMessage: "로그인이 필요합니다.",
+    });
+    return;
+  }
   try {
     const { date, content, postId } = await postCommentsSchema.validateAsync(
       req.body
     );
-    const writer = res.locals.user.nickname;
-    if (!writer) {
-      res.status(401).send({
-        errorMessage: "로그인이 필요합니다.",
-      });
-      return;
-    }
+
     await Comment.create({
       postId,
       writer,
@@ -58,14 +60,10 @@ router.patch("/update/:commentId/set", authMiddleware, async (req, res) => {
   try {
     const { commentId } = req.params;
     const { content } = await postCommentsSchema.validateAsync(req.body);
-    let today = new Date();
-    const todate = `${today.getFullYear()}-${
-      today.getMonth() + 1
-    }-${today.getDate()} ${today.getHours()}:${today.getMinutes()}`;
+
     let comment = await Comment.findOne({ _id: commentId });
     if (comment) {
       comment.content = content;
-      comment.date = todate;
       await comment.save();
     }
     res.send({ result: "success" });

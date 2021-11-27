@@ -5,7 +5,7 @@ const Joi = require("joi");
 const router = express.Router();
 const authMiddleware = require("../middlewares/auth-middleware");
 /*
-유효성검사
+회원가입 유효성검사
 */
 const postUsersSchema = Joi.object({
   nickname: Joi.string().alphanum().min(3).required(),
@@ -51,6 +51,13 @@ router.post("/users", async (req, res) => {
     });
   }
 });
+/*
+로그인 유효성검사
+*/
+const postAuthsSchema = Joi.object({
+  nickname: Joi.string().alphanum().min(3).required(),
+  password: Joi.string().required(),
+});
 
 /*
 로그인
@@ -59,7 +66,7 @@ router.post("/users", async (req, res) => {
 // 일반적으로 로그인에 자주 사용되는 경로!
 router.post("/auth", async (req, res) => {
   try {
-    const { nickname, password } = await postUsersSchema.validateAsync(
+    const { nickname, password } = await postAuthsSchema.validateAsync(
       req.body
     );
 

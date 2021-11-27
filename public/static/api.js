@@ -11,8 +11,10 @@ function getSelf(callback) {
     },
     error: function (error) {
       alert(error.responseJSON.errorMessage);
+      if (error.status == 401) {
+        window.location.href = "/logins";
+      }
       localStorage.clear();
-      window.location.href = "/logins";
     },
   });
 }
