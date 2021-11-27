@@ -2,7 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 //mongodb연결
-mongoose.connect("mongodb://localhost/blog_demo2", {
+mongoose.connect("mongodb://blog2:blog2@localhost/admin", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
